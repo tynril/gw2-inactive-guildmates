@@ -10,22 +10,23 @@ require 'date'
 
 # Stores information about a player in the guild.
 class Player
-	attr_reader :name, :points, :lastConnection
+	attr_reader :name, :points, :lastConnection, :server
 
-	def initialize(name, points, lastConnection)
+	def initialize(name, points, lastConnection, server)
 		@name = name
 		@points = points
 		@lastConnection = lastConnection
+		@server = server
 	end
 
 	def to_s
-		return @name + " (" + @points + ", " + @lastConnection.to_s + ")"
+		return @name + " (" + @points + ", " + @lastConnection.to_s + ", " + @server + ")"
 	end
 end
 
 # Function to parse the data file provided.
 def getPlayers(file)
-	playerBlockRegex = /.*>(?<name>[A-Za-z ]+.[0-9]{4})<.*>(?<points>\d+)<.*>\d*Since(?<date>[^<]+)<.*>([^<]+)<.*/
+	playerBlockRegex = /.*>(?<name>[A-Za-z ]+.[0-9]{4})<.*>(?<points>\d+)<.*>\d*Since(?<date>[^<]+)<.*>(?<server>[^<]+)<.*/
 	inPlayerBlock = false
 	playerBlock = ""
 	playersList = []
@@ -52,7 +53,7 @@ def getPlayers(file)
 					puts "The RegEx doesn't capture this: " + playerBlock
 				else
 					lastConnection = DateTime.strptime(data[:date], '%m/%d/%y %I:%M %p %Z')
-					playersList.push(Player.new(data[:name], data[:points], lastConnection))
+					playersList.push(Player.new(data[:name], data[:points], lastConnection, data[:server]))
 				end
 			else
 				playerBlock += line
